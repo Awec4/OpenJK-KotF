@@ -1773,6 +1773,45 @@ void Menu_SetItemBackground(const menuDef_t *menu,const char *itemName, const ch
 	}
 }
 
+// Change the exec command for a button.
+void Menu_SetItemExec(const menuDef_t *menu, const char *itemName, const char *text)
+{
+	try
+	{
+
+		itemDef_t	*item;
+		int			j, count;
+
+		if (!menu)	// No menu???
+		{
+			return;
+		}
+
+		count = Menu_ItemsMatchingGroup((menuDef_t *)menu, itemName);
+
+		for (j = 0; j < count; j++)
+		{
+			item = Menu_GetMatchingItemByNumber((menuDef_t *)menu, j, itemName);
+			if (item != NULL)
+			{
+				if (((text[0] == 'n') && (text[1] == 'p') && (text[2] == 'c')))
+				{
+					item->exec = (char*)text;
+					return;
+				}
+
+			}
+		}
+	}
+	catch (...)
+	{
+
+	}
+	return;
+
+	
+}
+
 // Set all the items within a given menu, with the given itemName, to the given text
 void Menu_SetItemText(const menuDef_t *menu,const char *itemName, const char *text)
 {
@@ -2070,6 +2109,32 @@ qboolean Script_SetItemText(itemDef_t *item, const char **args)
 	if (String_Parse(args, &itemName) && String_Parse(args, &text))
 	{
 		Menu_SetItemText((menuDef_t *) item->parent, itemName, text);
+	}
+	return qtrue;
+}
+/*
+=================
+Script_SetItemExec
+=================
+*/
+qboolean Script_SetItemExec(itemDef_t *item, const char **args)
+{
+	try
+	{
+		// expecting text
+		const char *itemName;
+		const char *text;
+
+		// expecting text
+		if (String_Parse(args, &itemName) && String_Parse(args, &text))
+		{
+			Menu_SetItemExec((menuDef_t *)item->parent, itemName, text);
+		}
+	}
+
+	catch (...)
+	{
+
 	}
 	return qtrue;
 }
@@ -2843,11 +2908,24 @@ Script_Exec
 qboolean Script_Exec ( itemDef_t *item, const char **args)
 {
 	const char *val;
-	if (String_Parse(args, &val))
+	try
 	{
-		DC->executeText(EXEC_APPEND, va("%s ; ", val));
+		if (item->exec != NULL)
+		{
+			if (item->exec[0] == 'n' && item->exec[1] == 'p' && item->exec[2] == 'c')
+			{
+				DC->executeText(EXEC_APPEND, va("%s ; bind h %s", item->exec, item->exec));
+			}
+		}
+		else if (String_Parse(args, &val))
+		{
+			DC->executeText(EXEC_APPEND, va("%s; ", val));
+		}
 	}
+	catch (...)
+	{
 
+	}
 	return qtrue;
 }
 
@@ -2968,6 +3046,7 @@ commandDef_t commandList[] =
   {"setitembackground", &Script_SetItemBackground},	// group/name
   {"setitemtext",	&Script_SetItemText},			// group/name
   {"setitemrect",	&Script_SetItemRect},			// group/name
+  {"setitemexec",	&Script_SetItemExec},			// group/name
   {"defer",			&Script_Defer},					//
   {"rundeferred",	&Script_RunDeferred},			//
   {"delay",			&Script_Delay},					// works on this (script)
@@ -4341,6 +4420,22 @@ qboolean ItemParse_action( itemDef_t *item)
 	return qtrue;
 }
 
+qboolean ItemParse_exec(itemDef_t *item)
+{
+	try
+	{
+		if (!PC_Script_Parse(&item->exec))
+		{
+			return qfalse;
+		}
+	}
+	catch (...)
+	{
+		return qfalse;
+	}
+	return qtrue;
+}
+
 
 /*
 ===============
@@ -4927,6 +5022,7 @@ keywordHash_t itemParseKeywords[] = {
 	{"elementtype",		ItemParse_elementtype,		},
 	{"elementwidth",	ItemParse_elementwidth,		},
 	{"enableCvar",		ItemParse_enableCvar,		},
+	{"exec",			ItemParse_exec,				},
 	{"feeder",			ItemParse_feeder,			},
 	{"flag",			ItemParse_flag,				},
 	{"focusSound",		ItemParse_focusSound,		},
