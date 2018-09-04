@@ -234,7 +234,6 @@ void NPC_RemoveBody( gentity_t *self )
 			|| self->client->NPC_class == CLASS_SENTRY
 			|| self->client->NPC_class == CLASS_PROBE
 			|| self->client->NPC_class == CLASS_INTERROGATOR
-			|| self->client->NPC_class == CLASS_PROBE
 			|| self->client->NPC_class == CLASS_MARK2 )
 		{
 			G_FreeEntity( self );
@@ -261,9 +260,6 @@ void NPC_RemoveBody( gentity_t *self )
 		if ( self->NPC && self->NPC->timeOfDeath <= level.time )
 		{
 			self->NPC->timeOfDeath = level.time + 1000;
-			// Only do all of this nonsense for Scav boys ( and girls )
-		///	if ( self->client->playerTeam == TEAM_SCAVENGERS || self->client->playerTeam == TEAM_KLINGON
-		//		|| self->client->playerTeam == TEAM_HIROGEN || self->client->playerTeam == TEAM_MALON )
 			// should I check NPC_class here instead of TEAM ? - dmv
 			if( self->client->playerTeam == TEAM_ENEMY || self->client->NPC_class == CLASS_PROTOCOL )
 			{
@@ -1287,7 +1283,7 @@ void NPC_BehaviorSet_Charmed( int bState )
 {
 	switch( bState )
 	{
-	case BS_FOLLOW_LEADER://# 40: Follow your leader and shoot any enemies you come across
+	case BS_FOLLOW_LEADER:	//# 40: Follow your leader and shoot any enemies you come across
 		NPC_BSFollowLeader();
 		break;
 	case BS_REMOVE:
@@ -1303,7 +1299,7 @@ void NPC_BehaviorSet_Charmed( int bState )
 		NPC_BSFlee();
 		break;
 	default:
-	case BS_DEFAULT://whatever
+	case BS_DEFAULT:		//whatever
 		NPC_BSDefault();
 		break;
 	}
@@ -1318,13 +1314,13 @@ void NPC_BehaviorSet_Default( int bState )
 {
 	switch( bState )
 	{
-	case BS_ADVANCE_FIGHT://head toward captureGoal, shoot anything that gets in the way
+	case BS_ADVANCE_FIGHT:	//head toward captureGoal, shoot anything that gets in the way
 		NPC_BSAdvanceFight ();
 		break;
-	case BS_SLEEP://Follow a path, looking for enemies
+	case BS_SLEEP:			//Follow a path, looking for enemies
 		NPC_BSSleep ();
 		break;
-	case BS_FOLLOW_LEADER://# 40: Follow your leader and shoot any enemies you come across
+	case BS_FOLLOW_LEADER:	//# 40: Follow your leader and shoot any enemies you come across
 		NPC_BSFollowLeader();
 		break;
 	case BS_JUMP:			//41: Face navgoal and jump to it.
@@ -1352,7 +1348,7 @@ void NPC_BehaviorSet_Default( int bState )
 		NPC_BSCinematic();
 		break;
 	default:
-	case BS_DEFAULT://whatever
+	case BS_DEFAULT:		//whatever
 		NPC_BSDefault();
 		break;
 	}
@@ -1591,7 +1587,7 @@ void NPC_BehaviorSet_Jedi( int bState )
 	case BS_PATROL:
 	case BS_STAND_AND_SHOOT:
 	case BS_HUNT_AND_KILL:
-	case BS_INVESTIGATE://WTF???!!
+	case BS_INVESTIGATE:	//WTF???!!
 	case BS_DEFAULT:
 		NPC_BSJedi_Default();
 		break;
@@ -1858,7 +1854,6 @@ extern bool Pilot_MasterUpdate();
 
 void NPC_RunBehavior( int team, int bState )
 {
-	//
 	if ( bState == BS_CINEMATIC )
 	{
 		NPC_BSCinematic();
@@ -1985,11 +1980,6 @@ void NPC_RunBehavior( int team, int bState )
 		switch( team )
 		{
 
-	//	case TEAM_SCAVENGERS:
-	//	case TEAM_IMPERIAL:
-	//	case TEAM_KLINGON:
-	//	case TEAM_HIROGEN:
-	//	case TEAM_MALON:
 		// not sure if TEAM_ENEMY is appropriate here, I think I should be using NPC_class to check for behavior - dmv
 		case TEAM_ENEMY:
 			// special cases for enemy droids
