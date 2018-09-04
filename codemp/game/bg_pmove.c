@@ -10394,11 +10394,11 @@ void PmoveSingle (pmove_t *pmove) {
 			if ( pm->ps->legsTimer > 0 || pm->ps->torsoTimer > 0 )
 			{
 				stiffenedUp = qtrue;
-				PM_SetPMViewAngle(pm->ps, pm->ps->viewangles, &pm->cmd);
+				//PM_SetPMViewAngle(pm->ps, pm->ps->viewangles, &pm->cmd);
 				pm->cmd.rightmove = 0;
 				pm->cmd.upmove = 0;
 				pm->cmd.forwardmove = 0;
-				pm->cmd.buttons = 0;
+				//pm->cmd.buttons = 0;
 			}
 		}
 	}
@@ -11249,6 +11249,13 @@ void Pmove (pmove_t *pmove) {
 
 		if ( pmove->ps->pm_flags & PMF_JUMP_HELD ) {
 			pmove->cmd.upmove = 20;
+		}
+	}
+	if ( !pmove->cmd.rightmove && !pmove->cmd.forwardmove && pmove->cmd.upmove <= 0 )
+	{
+		if ( VectorCompare( pmove->ps->velocity, vec3_origin ) )
+		{
+			pmove->ps->lastStationary = finalTime;
 		}
 	}
 }

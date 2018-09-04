@@ -1164,6 +1164,7 @@ typedef struct playerState_s {
 	int			entityEventSequence;
 
 	int			lastOnGround;	//last time you were on the ground
+	int			lastStationary;	//last time you were on the ground
 
 	qboolean	saberInFlight;
 
