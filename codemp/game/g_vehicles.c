@@ -25,7 +25,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 #include "bg_vehicles.h"
 
-extern gentity_t *NPC_Spawn_Do( gentity_t *ent );
+extern gentity_t *NPC_Spawn_Do( gentity_t *ent, gentity_t *client );
 extern void NPC_SetAnim(gentity_t	*ent,int setAnimParts,int anim,int setAnimFlags);
 
 extern void BG_SetAnim(playerState_t *ps, animation_t *animations, int setAnimParts,int anim,int setAnimFlags, int blendTime);
@@ -85,7 +85,7 @@ void G_VehicleSpawn( gentity_t *self )
 	//save this because self gets removed in next func
 	yaw = self->s.angles[YAW];
 
-	vehEnt = NPC_Spawn_Do( self );
+	vehEnt = NPC_Spawn_Do( self,0 );
 
 	if ( !vehEnt )
 	{
