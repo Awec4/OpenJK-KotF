@@ -134,8 +134,8 @@ static vec3_t muzzle;
 
 // Stun Baton
 //--------------
-#define STUN_BATON_DAMAGE			55
-#define STUN_BATON_ALT_DAMAGE		55
+#define STUN_BATON_DAMAGE			45
+#define STUN_BATON_ALT_DAMAGE		45
 #define STUN_BATON_RANGE			13
 
 // Melee
@@ -172,7 +172,7 @@ static vec3_t muzzle;
 //---------
 #define CLONERIFLE_SPREAD				1.1f//1.2f
 #define CLONERIFLE_VELOCITY				3300
-#define CLONERIFLE_DAMAGE				17
+#define CLONERIFLE_DAMAGE				20
 
 // DC-17M
 //---------
@@ -183,8 +183,8 @@ static vec3_t muzzle;
 // A280
 //---------
 #define REBELRIFLE_SPREAD				1.5f//1.2f
-#define REBELRIFLE_VELOCITY				2850
-#define REBELRIFLE_DAMAGE				82
+#define REBELRIFLE_VELOCITY				2950
+#define REBELRIFLE_DAMAGE				62
 
 // LPA NN-14
 //--------
@@ -203,12 +203,12 @@ static vec3_t muzzle;
 //---------
 #define BOBA_SPREAD					1.5f//1.2f
 #define BOBA_VELOCITY				3200
-#define BOBA_DAMAGE					68
+#define BOBA_DAMAGE					58
 
 // DC-17 Hand Pistol
 //--------
 #define CLONEPISTOL_VEL					3600
-#define CLONEPISTOL_DAMAGE				18
+#define CLONEPISTOL_DAMAGE				24
 #define CLONEPISTOL_CHARGE_UNIT			200.0f	// bryar charging gives us one more unit every 200ms--if you change this, you'll have to do the same in bg_pmove
 #define CLONEPISTOL_ALT_SIZE			1.0f
 
