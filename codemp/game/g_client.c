@@ -2755,6 +2755,10 @@ void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 			trap->SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " %s\n\"", client->pers.netname, G_GetStringEdString("MP_SVGAME", "PLENTER")) );
 		}
 	}
+
+	client->playerTeam = ent->s.teamowner = NPCTEAM_PLAYER;
+	client->enemyTeam = NPCTEAM_ENEMY;
+	
 	G_LogPrintf( "ClientBegin: %i\n", clientNum );
 
 	// count current clients and rank for scoreboard
@@ -3118,9 +3122,13 @@ void ClientSpawn(gentity_t *ent) {
 	void				*g2WeaponPtrs[MAX_SABERS];
 	char				userinfo[MAX_INFO_STRING] = {0}, *key = NULL, *value = NULL, *saber = NULL;
 	qboolean			changedSaber = qfalse, inSiegeWithClass = qfalse;
+	int					team,enemyteam;
 
 	index = ent - g_entities;
 	client = ent->client;
+	team = client->playerTeam;
+	enemyteam = client->enemyTeam;
+//	Com_Printf( S_COLOR_GREEN"%s^2 team %i, enemyteam %i\n", ent->client->pers.netname, team, enemyteam );
 
 	//first we want the userinfo so we can see if we should update this client's saber -rww
 	trap->GetUserinfo( index, userinfo, sizeof( userinfo ) );
@@ -3537,11 +3545,6 @@ void ClientSpawn(gentity_t *ent) {
 		}
 	}
 
-	/*
-	client->ps.stats[STAT_HOLDABLE_ITEMS] |= ( 1 << HI_BINOCULARS );
-	client->ps.stats[STAT_HOLDABLE_ITEM] = BG_GetItemIndexByTag(HI_BINOCULARS, IT_HOLDABLE);
-	*/
-
 	if (level.gametype == GT_SIEGE && client->siegeClass != -1 &&
 		client->sess.sessionTeam != TEAM_SPECTATOR)
 	{ //well then, we will use a custom weaponset for our class
@@ -3821,11 +3824,10 @@ void ClientSpawn(gentity_t *ent) {
 			client->playerTeam = ent->s.teamowner = NPCTEAM_PLAYER;
 			client->enemyTeam = NPCTEAM_ENEMY;
 		}
-	}
-	else
+	}	else
 	{
-		client->playerTeam = ent->s.teamowner = NPCTEAM_PLAYER;
-		client->enemyTeam = NPCTEAM_ENEMY;
+			client->playerTeam = ent->s.teamowner = team;
+			client->enemyTeam = enemyteam;
 	}
 
 	/*

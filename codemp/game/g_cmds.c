@@ -395,6 +395,108 @@ void Cmd_GiveOther_f( gentity_t *ent )
 
 /*
 ==================
+Cmd_ForceSetLevel
+
+Sets Force powers for a client
+==================
+*/
+
+typedef struct SetForceCmd_s {
+	const char *desc;
+	const char *cmdname;
+	const int maxlevel;
+} SetForceCmd_t;
+
+SetForceCmd_t SetForceTable[NUM_FORCE_POWERS] = {
+	{ "forceHeal",			"Heal",				FORCE_LEVEL_3			},//FP_HEAL
+	{ "forceJump",			"Jump",				FORCE_LEVEL_3			},//FP_LEVITATION
+	{ "forceSpeed",			"Speed",			FORCE_LEVEL_3			},//FP_SPEED
+	{ "forcePush",			"Push",				FORCE_LEVEL_3			},//FP_PUSH
+	{ "forcePull",			"Pull",				FORCE_LEVEL_3			},//FP_PULL
+	{ "forceMindTrick",		"MindTrick",		FORCE_LEVEL_4			},//FP_TELEPATHY
+	{ "forceGrip",			"Grip",				FORCE_LEVEL_3			},//FP_GRIP
+	{ "forceLightning",		"Lightning",		FORCE_LEVEL_3			},//FP_LIGHTNING
+	{ "forceRage",			"Rage",				FORCE_LEVEL_3			},//FP_RAGE
+	{ "forceProtect",		"Protect",			FORCE_LEVEL_3			},//FP_PROTECT
+	{ "forceAbsorb",		"Absorb",			FORCE_LEVEL_3			},//FP_ABSORB
+	{ "forceTeamHeal",		"TeamHeal",			FORCE_LEVEL_3			},//FP_TEAM_HEAL
+	{ "forceTeamForce",		"TeamEnergize",		FORCE_LEVEL_3			},//FP_TEAM_FORCE
+	{ "forceDrain",			"Drain",			FORCE_LEVEL_3			},//FP_DRAIN
+	{ "forceSight",			"Sight",			FORCE_LEVEL_3			},//FP_SEE
+	{ "saberOffense",		"Offense",			SS_NUM_SABER_STYLES-1	},//FP_SABER_OFFENSE
+	{ "saberDefense",		"Defense",			FORCE_LEVEL_3			},//FP_SABER_DEFENSE
+	{ "saberThrow",			"Throw",			FORCE_LEVEL_3			},//FP_SABERTHROW
+};
+
+void g_ForceSetLevel_f(gentity_t *ent, const char *name, const char *args, int argc )
+{
+	qboolean	force_all = qfalse;
+	
+	Com_Printf( S_COLOR_GREEN"%s^2 used Set Force %s\n", ent->client->pers.netname, name);
+	
+	if ( !Q_stricmp( name, "all" ) )
+		force_all = qtrue;
+
+	for ( int i = FP_HEAL; i < NUM_FORCE_POWERS; i++ )
+	{
+		if (( force_all || !Q_stricmp( name, SetForceTable[i].cmdname ) ) && (( i != FP_TEAM_HEAL && i != FP_TEAM_FORCE) || (level.gametype == GT_TEAM || level.gametype == GT_CTF || level.gametype == GT_CTY) ))
+		{
+			trap->SendServerCommand( ent-g_entities, va( "print \"Current %s level is %d\n\"", SetForceTable[i].desc, ent->client->ps.fd.forcePowerLevel[i] ) );
+			if ( argc == 3 )
+			{
+				ent->client->ps.fd.forcePowerLevel[i] = Com_Clampi( 0, SetForceTable[i].maxlevel, atoi( args ) );
+				if ( !ent->client->ps.fd.forcePowerLevel[i] )
+					ent->client->ps.fd.forcePowersKnown &= ~(1 << i);
+				else
+					ent->client->ps.fd.forcePowersKnown |= (1 << i);
+			}
+			else
+			{
+				ent->client->ps.fd.forcePowerLevel[i] = 3;
+				ent->client->ps.fd.forcePowersKnown |= (1 << i);
+			}
+		}
+		
+	
+	if ( force_all || !Q_stricmp( name, SetForceTable[FP_SABER_OFFENSE].cmdname ) )
+	{
+		if ( ent->client->saber[0].model[0] && ent->client->saber[1].model[0] )
+		{ //dual
+			ent->client->ps.fd.saberAnimLevelBase = ent->client->ps.fd.saberAnimLevel = ent->client->ps.fd.saberDrawAnimLevel = SS_DUAL;
+		}
+		else if ( (ent->client->saber[0].saberFlags&SFL_TWO_HANDED) )
+		{ //staff
+			ent->client->ps.fd.saberAnimLevelBase = ent->client->ps.fd.saberAnimLevel = ent->client->ps.fd.saberDrawAnimLevel = SS_STAFF;
+		}
+		else
+		{
+			ent->client->sess.saberLevel = Com_Clampi( SS_FAST, SetForceTable[FP_SABER_OFFENSE].maxlevel, ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] );
+			ent->client->ps.fd.saberAnimLevelBase = ent->client->ps.fd.saberAnimLevel = ent->client->ps.fd.saberDrawAnimLevel = ent->client->sess.saberLevel;
+		}
+	}
+/*
+		if( trap->Argc() > 1 )
+		{
+			for ( int i = SS_NONE+1; i < SS_NUM_SABER_STYLES; i++ )
+			{
+				g_entities[0].client->ps.saberStylesKnown |= (1<<i);
+			}
+		}
+		*/
+	}
+
+}
+
+static void Cmd_ForceSetLevel_f(gentity_t *ent)
+{
+	char name[MAX_TOKEN_CHARS] = {0};
+
+	trap->Argv( 1, name, sizeof( name ) );
+	g_ForceSetLevel_f( ent, name, ConcatArgs( 2 ), trap->Argc());
+}
+
+/*
+==================
 Cmd_God_f
 
 Sets client to godmode
@@ -934,6 +1036,66 @@ void SetTeam( gentity_t *ent, char *s ) {
 
 /*
 =================
+SetNPCTeam
+=================
+*/
+void SetNPCTeam( gentity_t *ent, char *s ) {
+	int					enemyteam, team, oldTeam;
+	gclient_t			*client;
+
+	// fix: this prevents rare creation of invalid players
+	if (!ent->inuse)
+	{
+		return;
+	}
+
+	//
+	// see what change is requested
+	//
+	client = ent->client;
+
+	if (ent->health <= 0 || ent->client->tempSpectate >= level.time || ent->client->sess.sessionTeam == TEAM_SPECTATOR)	//don't allow setting npc team while spectating
+		return;
+		
+	team = client->playerTeam;
+	
+	if ( level.gametype < GT_SIEGE ) //no NPC team changing in siege mode
+	{
+		if ( !Q_stricmp( s, "player" )) {
+			team = NPCTEAM_PLAYER;
+			enemyteam = NPCTEAM_ENEMY;
+		} else if ( !Q_stricmp( s, "enemy" ) ) {
+			team = NPCTEAM_ENEMY;
+			enemyteam = NPCTEAM_PLAYER;
+		} else if ( !Q_stricmp( s, "free" ) ) {
+			team = NPCTEAM_FREE;
+			enemyteam = NPCTEAM_ENEMY;
+		} else if ( !Q_stricmp( s, "neutral" )) {
+			team = NPCTEAM_NEUTRAL;
+			enemyteam = NPCTEAM_ENEMY;
+		}
+		else
+		{
+			trap->SendServerCommand( ent-g_entities, va("print \"Valid teams are: player, enemy, free, neutral\n\"") );
+		}
+
+		oldTeam = client->playerTeam;
+
+		//
+		// decide if we will allow the change
+		//
+		if ( team == oldTeam && team != TEAM_SPECTATOR ) {
+			return;
+		}
+
+		client->playerTeam = (team_t)team;
+		client->enemyTeam = (team_t)enemyteam;
+		trap->SendServerCommand( ent-g_entities, va("print \"Set player team to %i, enemy team to %i\n\"", team, enemyteam) );
+	}
+}
+
+/*
+=================
 StopFollowing
 
 If the client being followed leaves the game, or you just want to drop
@@ -1036,6 +1198,67 @@ void Cmd_Team_f( gentity_t *ent ) {
 
 	// fix: update team switch time only if team change really happend
 	if (oldTeam != ent->client->sess.sessionTeam)
+		ent->client->switchTeamTime = level.time + 5000;
+}
+
+/*
+=================
+Cmd_NPCTeam_f
+=================
+*/
+void Cmd_NPCTeam_f( gentity_t *ent ) {
+	int			oldTeam;
+	char		s[MAX_TOKEN_CHARS];
+
+	oldTeam = ent->client->playerTeam;
+
+	if ( trap->Argc() != 2 ) {
+		switch ( oldTeam ) {
+		case NPCTEAM_PLAYER:
+			trap->SendServerCommand( ent-g_entities, va("print \"%s\n\"", "Player Team") );
+			break;
+		case NPCTEAM_NEUTRAL:
+			trap->SendServerCommand( ent-g_entities, va("print \"%s\n\"", "Neutral Team") );
+			break;
+		case NPCTEAM_ENEMY:
+			trap->SendServerCommand( ent-g_entities, va("print \"%s\n\"", "Enemy Team") );
+			break;
+		case NPCTEAM_FREE:
+			trap->SendServerCommand( ent-g_entities, va("print \"%s\n\"", "Free Team") );
+			break;
+		}
+		return;
+	}
+
+	if ( ent->client->switchTeamTime > level.time ) {
+		trap->SendServerCommand( ent-g_entities, va("print \"%s\n\"", G_GetStringEdString("MP_SVGAME", "NOSWITCH")) );
+		return;
+	}
+
+	if (gEscaping)
+	{
+		trap->SendServerCommand( ent-g_entities, va("print \"%s\n\"", "gEscaping") );
+		return;
+	}
+
+	if ( level.gametype == GT_DUEL) {
+		//disallow changing teams
+		trap->SendServerCommand( ent-g_entities, "print \"Cannot switch teams in Duel\n\"" );
+		return;
+	}
+
+	if (level.gametype == GT_POWERDUEL)
+	{ //don't let clients change teams manually at all in powerduel
+		trap->SendServerCommand( ent-g_entities, "print \"Cannot switch teams in Power Duel\n\"" );
+		return;
+	}
+
+	trap->Argv( 1, s, sizeof( s ) );
+
+	SetNPCTeam( ent, s );
+
+	// fix: update team switch time only if team change really happend
+	if (oldTeam != ent->client->playerTeam)
 		ent->client->switchTeamTime = level.time + 5000;
 }
 
@@ -3440,9 +3663,11 @@ command_t commands[] = {
 	{ "noclip",				Cmd_Noclip_f,				CMD_CHEAT|CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "notarget",			Cmd_Notarget_f,				CMD_CHEAT|CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "npc",				Cmd_NPC_f,					CMD_CHEAT|CMD_ALIVE },
+	{ "npcteam",			Cmd_NPCTeam_f,				CMD_CHEAT|CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "say",				Cmd_Say_f,					0 },
 	{ "say_team",			Cmd_SayTeam_f,				0 },
 	{ "score",				Cmd_Score_f,				0 },
+	{ "setForce",			Cmd_ForceSetLevel_f,		CMD_CHEAT },
 	{ "setviewpos",			Cmd_SetViewpos_f,			CMD_CHEAT|CMD_NOINTERMISSION },
 	{ "siegeclass",			Cmd_SiegeClass_f,			CMD_NOINTERMISSION },
 	{ "team",				Cmd_Team_f,					CMD_NOINTERMISSION },
