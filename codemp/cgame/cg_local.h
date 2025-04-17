@@ -1161,7 +1161,7 @@ typedef struct cgMedia_s {
 	qhandle_t	blackSaberBlurShader;
 	qhandle_t	saberBlurShader;
 	qhandle_t	swordTrailShader;
-	
+
 	qhandle_t	rgbSaberGlowShader;
 	qhandle_t	rgbSaberCoreShader;
 
@@ -1407,6 +1407,10 @@ typedef struct cgMedia_s {
 
 	// For vehicles only now
 	sfxHandle_t	noAmmoSound;
+
+	// Reload sounds
+	sfxHandle_t	reloadSound;
+	sfxHandle_t	reloadCompleteSound;
 
 } cgMedia_t;
 

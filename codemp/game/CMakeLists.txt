@@ -64,6 +64,7 @@ set(MPGameGameFiles
 	"${MPDir}/game/g_nav.c"
 	"${MPDir}/game/g_navnew.c"
 	"${MPDir}/game/g_object.c"
+	"${MPDir}/game/g_reload.c"
 	"${MPDir}/game/g_saga.c"
 	"${MPDir}/game/g_session.c"
 	"${MPDir}/game/g_spawn.c"
@@ -149,7 +150,7 @@ set(MPGameCommonFiles
 	"${MPDir}/qcommon/disablewarnings.h"
 	"${MPDir}/qcommon/q_shared.h"
 	"${MPDir}/qcommon/tags.h"
-	
+
 	${SharedCommonFiles}
 	)
 source_group("common" FILES ${MPGameCommonFiles})

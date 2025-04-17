@@ -422,6 +422,7 @@ typedef enum {
 	WEAPON_CHARGING,
 	WEAPON_CHARGING_ALT,
 	WEAPON_IDLE, //lowered		// NOTENOTE Added with saber
+	WEAPON_RELOADING, // Added for reload system
 } weaponstate_t;
 
 
@@ -937,6 +938,9 @@ typedef enum {
 	EV_WEAPON_CHARGE_ALT,
 
 	EV_SHIELD_HIT,
+
+	EV_RELOAD_WEAPON,
+	EV_RELOAD_WEAPON_COMPLETE,
 
 	EV_DEBUG_LINE,
 	EV_TESTLINE,

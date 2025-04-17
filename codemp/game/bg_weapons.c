@@ -65,7 +65,9 @@ weaponData_t weaponData[WP_NUM_WEAPONS] =
 		0,						//	int		chargeSub;			// amount to subtract during charge on each interval
 		0,						//int		altChargeSub;		// above for secondary
 		0,						//	int		maxCharge;			// stop subtracting once charged for this many ms
-		0						//	int		altMaxCharge;		// above for secondary
+		0,						//	int		altMaxCharge;		// above for secondary
+		0,						//	int		clipSize;			// Size of the clip (0 for no reload)
+		0						//	int		reloadTime;		// Time it takes to reload the weapon
 	},
 	{	// WP_STUN_BATON
 //		"Stun Baton",			//	char	classname[32];		// Spawning name
@@ -82,7 +84,9 @@ weaponData_t weaponData[WP_NUM_WEAPONS] =
 		0,						//	int		chargeSub;			// amount to subtract during charge on each interval
 		0,						//int		altChargeSub;		// above for secondary
 		0,						//	int		maxCharge;			// stop subtracting once charged for this many ms
-		0						//	int		altMaxCharge;		// above for secondary
+		0,						//	int		altMaxCharge;		// above for secondary
+		0,						//	int		clipSize;			// Size of the clip (0 for no reload)
+		0						//	int		reloadTime;		// Time it takes to reload the weapon
 	},
 	{	// WP_MELEE
 //		"Melee",			//	char	classname[32];		// Spawning name
@@ -99,7 +103,9 @@ weaponData_t weaponData[WP_NUM_WEAPONS] =
 		0,						//	int		chargeSub;			// amount to subtract during charge on each interval
 		0,						//int		altChargeSub;		// above for secondary
 		0,						//	int		maxCharge;			// stop subtracting once charged for this many ms
-		0						//	int		altMaxCharge;		// above for secondary
+		0,						//	int		altMaxCharge;		// above for secondary
+		0,						//	int		clipSize;			// Size of the clip (0 for no reload)
+		0						//	int		reloadTime;		// Time it takes to reload the weapon
 	},
 	{	// WP_SABER,
 //		"Lightsaber",			//	char	classname[32];		// Spawning name
@@ -116,7 +122,9 @@ weaponData_t weaponData[WP_NUM_WEAPONS] =
 		0,						//	int		chargeSub;			// amount to subtract during charge on each interval
 		0,						//int		altChargeSub;		// above for secondary
 		0,						//	int		maxCharge;			// stop subtracting once charged for this many ms
-		0						//	int		altMaxCharge;		// above for secondary
+		0,						//	int		altMaxCharge;		// above for secondary
+		0,						//	int		clipSize;			// Size of the clip (0 for no reload)
+		0						//	int		reloadTime;		// Time it takes to reload the weapon
 	},
 	{	// WP_BRYAR_PISTOL,
 //		"Bryar Pistol",			//	char	classname[32];		// Spawning name
@@ -134,6 +142,8 @@ weaponData_t weaponData[WP_NUM_WEAPONS] =
 		0,//1,						//int		altChargeSub;		// above for secondary
 		0,						//	int		maxCharge;			// stop subtracting once charged for this many ms
 		0,//1500					//	int		altMaxCharge;		// above for secondary
+		10,						//	int		clipSize;			// Size of the clip (0 for no reload)
+		800						//	int		reloadTime;		// Time it takes to reload the weapon
 	},
 	{	// WP_BLASTER
 //		"E11 Blaster Rifle",	//	char	classname[32];		// Spawning name
@@ -150,7 +160,9 @@ weaponData_t weaponData[WP_NUM_WEAPONS] =
 		0,						//	int		chargeSub;			// amount to subtract during charge on each interval
 		0,						//int		altChargeSub;		// above for secondary
 		0,						//	int		maxCharge;			// stop subtracting once charged for this many ms
-		0						//	int		altMaxCharge;		// above for secondary
+		0,						//	int		altMaxCharge;		// above for secondary
+		30,						//	int		clipSize;			// Size of the clip (0 for no reload)
+		1000					//	int		reloadTime;		// Time it takes to reload the weapon
 	},
 	{	// WP_DISRUPTOR
 //		"Tenloss Disruptor Rifle",//	char	classname[32];		// Spawning name
@@ -167,7 +179,9 @@ weaponData_t weaponData[WP_NUM_WEAPONS] =
 		0,						//	int		chargeSub;			// amount to subtract during charge on each interval
 		3,						//int		altChargeSub;		// above for secondary
 		0,						//	int		maxCharge;			// stop subtracting once charged for this many ms
-		1700					//	int		altMaxCharge;		// above for secondary
+		1700,					//	int		altMaxCharge;		// above for secondary
+		10,						//	int		clipSize;			// Size of the clip (0 for no reload)
+		1500					//	int		reloadTime;		// Time it takes to reload the weapon
 	},
 	{	// WP_BOWCASTER
 //		"Wookiee Bowcaster",		//	char	classname[32];		// Spawning name
@@ -184,7 +198,9 @@ weaponData_t weaponData[WP_NUM_WEAPONS] =
 		5,						//	int		chargeSub;			// amount to subtract during charge on each interval
 		0,						//int		altChargeSub;		// above for secondary
 		1700,						//	int		maxCharge;			// stop subtracting once charged for this many ms
-		0					//	int		altMaxCharge;		// above for secondary
+		0,					//	int		altMaxCharge;		// above for secondary
+		8,						//	int		clipSize;			// Size of the clip (0 for no reload)
+		1200					//	int		reloadTime;		// Time it takes to reload the weapon
 	},
 	{	// WP_REPEATER
 //		"Imperial Heavy Repeater",//	char	classname[32];		// Spawning name
@@ -201,7 +217,9 @@ weaponData_t weaponData[WP_NUM_WEAPONS] =
 		0,						//	int		chargeSub;			// amount to subtract during charge on each interval
 		0,						//int		altChargeSub;		// above for secondary
 		0,						//	int		maxCharge;			// stop subtracting once charged for this many ms
-		0						//	int		altMaxCharge;		// above for secondary
+		0,						//	int		altMaxCharge;		// above for secondary
+		60,						//	int		clipSize;			// Size of the clip (0 for no reload)
+		1800					//	int		reloadTime;		// Time it takes to reload the weapon
 	},
 	{	// WP_DEMP2
 //		"DEMP2",				//	char	classname[32];		// Spawning name
@@ -218,7 +236,9 @@ weaponData_t weaponData[WP_NUM_WEAPONS] =
 		0,						//	int		chargeSub;			// amount to subtract during charge on each interval
 		3,						//	int		altChargeSub;		// above for secondary
 		0,						//	int		maxCharge;			// stop subtracting once charged for this many ms
-		2100					//	int		altMaxCharge;		// above for secondary
+		2100,					//	int		altMaxCharge;		// above for secondary
+		15,						//	int		clipSize;			// Size of the clip (0 for no reload)
+		1300					//	int		reloadTime;		// Time it takes to reload the weapon
 	},
 	{	// WP_FLECHETTE
 //		"Golan Arms Flechette",	//	char	classname[32];		// Spawning name
@@ -235,7 +255,9 @@ weaponData_t weaponData[WP_NUM_WEAPONS] =
 		0,						//	int		chargeSub;			// amount to subtract during charge on each interval
 		0,						//int		altChargeSub;		// above for secondary
 		0,						//	int		maxCharge;			// stop subtracting once charged for this many ms
-		0						//	int		altMaxCharge;		// above for secondary
+		0,						//	int		altMaxCharge;		// above for secondary
+		12,						//	int		clipSize;			// Size of the clip (0 for no reload)
+		1600					//	int		reloadTime;		// Time it takes to reload the weapon
 	},
 	{	// WP_ROCKET_LAUNCHER
 //		"Merr-Sonn Missile System",	//	char	classname[32];		// Spawning name
@@ -252,7 +274,9 @@ weaponData_t weaponData[WP_NUM_WEAPONS] =
 		0,						//	int		chargeSub;			// amount to subtract during charge on each interval
 		0,						//int		altChargeSub;		// above for secondary
 		0,						//	int		maxCharge;			// stop subtracting once charged for this many ms
-		0						//	int		altMaxCharge;		// above for secondary
+		0,						//	int		altMaxCharge;		// above for secondary
+		5,						//	int		clipSize;			// Size of the clip (0 for no reload)
+		2000					//	int		reloadTime;		// Time it takes to reload the weapon
 	},
 	{	// WP_THERMAL
 //		"Thermal Detonator",	//	char	classname[32];		// Spawning name
@@ -269,7 +293,9 @@ weaponData_t weaponData[WP_NUM_WEAPONS] =
 		0,						//	int		chargeSub;			// amount to subtract during charge on each interval
 		0,						//int		altChargeSub;		// above for secondary
 		0,						//	int		maxCharge;			// stop subtracting once charged for this many ms
-		0						//	int		altMaxCharge;		// above for secondary
+		0,						//	int		altMaxCharge;		// above for secondary
+		0,						//	int		clipSize;			// Size of the clip (0 for no reload)
+		0						//	int		reloadTime;		// Time it takes to reload the weapon
 	},
 	{	// WP_TRIP_MINE
 //		"Trip Mine",			//	char	classname[32];		// Spawning name
@@ -286,7 +312,9 @@ weaponData_t weaponData[WP_NUM_WEAPONS] =
 		0,						//	int		chargeSub;			// amount to subtract during charge on each interval
 		0,						//int		altChargeSub;		// above for secondary
 		0,						//	int		maxCharge;			// stop subtracting once charged for this many ms
-		0						//	int		altMaxCharge;		// above for secondary
+		0,						//	int		altMaxCharge;		// above for secondary
+		0,						//	int		clipSize;			// Size of the clip (0 for no reload)
+		0						//	int		reloadTime;		// Time it takes to reload the weapon
 	},
 	{	// WP_DET_PACK
 //		"Det Pack",				//	char	classname[32];		// Spawning name
@@ -303,7 +331,9 @@ weaponData_t weaponData[WP_NUM_WEAPONS] =
 		0,						//	int		chargeSub;			// amount to subtract during charge on each interval
 		0,						//int		altChargeSub;		// above for secondary
 		0,						//	int		maxCharge;			// stop subtracting once charged for this many ms
-		0						//	int		altMaxCharge;		// above for secondary
+		0,						//	int		altMaxCharge;		// above for secondary
+		0,						//	int		clipSize;			// Size of the clip (0 for no reload)
+		0						//	int		reloadTime;		// Time it takes to reload the weapon
 	},
 	{	// WP_CONCUSSION
 //		"Concussion Rifle",		//	char	classname[32];		// Spawning name
@@ -320,7 +350,9 @@ weaponData_t weaponData[WP_NUM_WEAPONS] =
 		0,						//	int		chargeSub;			// amount to subtract during charge on each interval
 		0,						//	int		altChargeSub;		// above for secondary
 		0,						//	int		maxCharge;			// stop subtracting once charged for this many ms
-		0						//	int		altMaxCharge;		// above for secondary
+		0,						//	int		altMaxCharge;		// above for secondary
+		6,						//	int		clipSize;			// Size of the clip (0 for no reload)
+		1500					//	int		reloadTime;		// Time it takes to reload the weapon
 	},
 	{	// WP_BRYAR_OLD,
 //		"Bryar Pistol",			//	char	classname[32];		// Spawning name
@@ -337,7 +369,9 @@ weaponData_t weaponData[WP_NUM_WEAPONS] =
 		0,						//	int		chargeSub;			// amount to subtract during charge on each interval
 		1,						//int		altChargeSub;		// above for secondary
 		0,						//	int		maxCharge;			// stop subtracting once charged for this many ms
-		1500					//	int		altMaxCharge;		// above for secondary
+		1500,					//	int		altMaxCharge;		// above for secondary
+		10,						//	int		clipSize;			// Size of the clip (0 for no reload)
+		800						//	int		reloadTime;		// Time it takes to reload the weapon
 	},
 	{	// WP_EMPLCACED_GUN
 //		"Emplaced Gun",			//	char	classname[32];		// Spawning name
@@ -354,7 +388,9 @@ weaponData_t weaponData[WP_NUM_WEAPONS] =
 		0,						//	int		chargeSub;			// amount to subtract during charge on each interval
 		0,						//int		altChargeSub;		// above for secondary
 		0,						//	int		maxCharge;			// stop subtracting once charged for this many ms
-		0						//	int		altMaxCharge;		// above for secondary
+		0,						//	int		altMaxCharge;		// above for secondary
+		0,						//	int		clipSize;			// Size of the clip (0 for no reload)
+		0						//	int		reloadTime;		// Time it takes to reload the weapon
 	},
 	{	// WP_TURRET - NOTE NOT ACTUALLY USEABLE BY PLAYER!
 //		"Emplaced Gun",			//	char	classname[32];		// Spawning name
@@ -371,7 +407,9 @@ weaponData_t weaponData[WP_NUM_WEAPONS] =
 		0,						//	int		chargeSub;			// amount to subtract during charge on each interval
 		0,						//int		altChargeSub;		// above for secondary
 		0,						//	int		maxCharge;			// stop subtracting once charged for this many ms
-		0						//	int		altMaxCharge;		// above for secondary
+		0,						//	int		altMaxCharge;		// above for secondary
+		0,						//	int		clipSize;			// Size of the clip (0 for no reload)
+		0						//	int		reloadTime;		// Time it takes to reload the weapon
 	}
 };
 

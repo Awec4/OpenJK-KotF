@@ -1293,6 +1293,11 @@ void CL_CmdButtons( usercmd_t *cmd ) {
 		cmd->buttons |= BUTTON_TALK;
 	}
 
+	// Add reload button
+	if (in_buttons[8].active || in_buttons[8].wasPressed) {
+		cmd->buttons |= BUTTON_RELOAD;
+	}
+
 	// allow the game to know if any key at all is
 	// currently pressed, even if it isn't bound to anything
 	if ( kg.anykeydown && Key_GetCatcher( ) == 0 ) {
@@ -1745,6 +1750,8 @@ static const cmdList_t inputCmds[] =
 	{ "-force_grip", NULL, IN_Button6Up, NULL },
 	{ "+altattack", "Alternate Attack", IN_Button7Down, NULL },
 	{ "-altattack", NULL, IN_Button7Up, NULL },
+	{ "+reload", "Reload weapon", IN_Button8Down, NULL },
+	{ "-reload", NULL, IN_Button8Up, NULL },
 	{ "+useforce", "Use selected force power", IN_Button9Down, NULL },
 	{ "-useforce", NULL, IN_Button9Up, NULL },
 	{ "+force_lightning", "Hold to use lightning force power", IN_Button10Down, NULL },

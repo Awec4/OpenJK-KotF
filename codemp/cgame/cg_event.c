@@ -3425,6 +3425,22 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		CG_PlayerShieldHit(es->otherEntityNum, dir, es->time2);
 		break;
 
+	case EV_RELOAD_WEAPON:
+		DEBUGNAME("EV_RELOAD_WEAPON");
+		{
+			// Play reload sound
+			trap->S_StartSound(NULL, es->number, CHAN_WEAPON, cgs.media.reloadSound);
+		}
+		break;
+
+	case EV_RELOAD_WEAPON_COMPLETE:
+		DEBUGNAME("EV_RELOAD_WEAPON_COMPLETE");
+		{
+			// Play reload complete sound
+			trap->S_StartSound(NULL, es->number, CHAN_WEAPON, cgs.media.reloadCompleteSound);
+		}
+		break;
+
 	case EV_DEBUG_LINE:
 		DEBUGNAME("EV_DEBUG_LINE");
 		CG_Beam( cent );

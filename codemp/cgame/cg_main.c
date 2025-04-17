@@ -842,6 +842,10 @@ static void CG_RegisterSounds( void ) {
 	cgs.media.zoomLoop	= trap->S_RegisterSound( "sound/interface/zoomloop.wav" );
 	cgs.media.zoomEnd	= trap->S_RegisterSound( "sound/interface/zoomend.wav" );
 
+	// Reload sounds
+	cgs.media.reloadSound = trap->S_RegisterSound( "sound/weapons/reload" );
+	cgs.media.reloadCompleteSound = trap->S_RegisterSound( "sound/weapons/reload_complete" );
+
 	for (i=0 ; i<4 ; i++) {
 		Com_sprintf (name, sizeof(name), "sound/player/footsteps/stone_step%i.wav", i+1);
 		cgs.media.footsteps[FOOTSTEP_STONEWALK][i] = trap->S_RegisterSound (name);

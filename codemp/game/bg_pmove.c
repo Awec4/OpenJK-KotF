@@ -3583,7 +3583,7 @@ static int PM_TryRoll( void )
 		}
 	}
 
-	if (PM_IsRocketTrooper() ||		
+	if (PM_IsRocketTrooper() ||
 //		(pm->ps->weapon != WP_SABER && pm->ps->weapon != WP_MELEE) ||
 		BG_HasYsalamiri(pm->gametype, pm->ps) ||
 		!BG_CanUseFPNow(pm->gametype, pm->ps, pm->cmd.serverTime, FP_LEVITATION))
@@ -5860,6 +5860,35 @@ void PM_FinishWeaponChange( void ) {
 	pm->ps->weapon = weapon;
 	pm->ps->weaponstate = WEAPON_RAISING;
 	pm->ps->weaponTime += 250;
+
+	// Initialize clip ammo for the new weapon if it uses clips
+	int clipSize = weaponData[weapon].clipSize;
+	if (clipSize > 0) {
+		// Get the ammo index for this weapon
+		int ammoIndex = weaponData[weapon].ammoIndex;
+
+		// Get the total ammo for this weapon
+		int totalAmmo = pm->ps->ammo[ammoIndex];
+
+		// If we have ammo, fill the clip
+		if (totalAmmo > 0) {
+			// Calculate how much ammo to add to the clip
+			int ammoToAdd = clipSize;
+			if (ammoToAdd > totalAmmo) {
+				ammoToAdd = totalAmmo;
+			}
+
+			// Add ammo to clip and remove from total
+			pm->ps->userInt2 = ammoToAdd;
+			pm->ps->ammo[ammoIndex] -= ammoToAdd;
+		} else {
+			// No ammo, empty clip
+			pm->ps->userInt2 = 0;
+		}
+
+		// Set clipSize in userInt3
+		pm->ps->userInt3 = clipSize;
+	}
 }
 
 #ifdef _GAME
@@ -7285,6 +7314,43 @@ static void PM_Weapon( void )
 		return;
 	}
 
+	// Check if we're done reloading
+	if (pm->ps->weaponstate == WEAPON_RELOADING) {
+		// If reload time is over
+		if (pm->ps->weaponTime <= 0) {
+			// Get the weapon data
+			int weaponNum = pm->ps->weapon;
+			int ammoIndex = weaponData[weaponNum].ammoIndex;
+			int clipSize = weaponData[weaponNum].clipSize;
+
+			// Get current clip ammo and total ammo
+			int currentClipAmmo = pm->ps->userInt2;
+			int totalAmmo = pm->ps->ammo[ammoIndex];
+
+			// Calculate how much ammo to add to the clip
+			int ammoToAdd = clipSize - currentClipAmmo;
+			if (ammoToAdd > totalAmmo) {
+				ammoToAdd = totalAmmo;
+			}
+
+			// Add ammo to clip and remove from total
+			pm->ps->userInt2 = currentClipAmmo + ammoToAdd;
+			pm->ps->ammo[ammoIndex] -= ammoToAdd;
+
+			// Set weapon state back to ready
+			pm->ps->weaponstate = WEAPON_READY;
+
+			// Play reload complete sound
+			PM_AddEvent(EV_RELOAD_WEAPON_COMPLETE);
+
+			// Set appropriate animation
+			if (PM_CanSetWeaponAnims()) {
+				PM_StartTorsoAnim(WeaponReadyAnim[pm->ps->weapon]);
+			}
+		}
+		return;
+	}
+
 	if (PM_CanSetWeaponAnims() &&
 		!PM_IsRocketTrooper() &&
 		pm->ps->weaponstate == WEAPON_READY && pm->ps->weaponTime <= 0 &&
@@ -7392,11 +7458,51 @@ static void PM_Weapon( void )
 		return;
 	}
 
+	// check for reload
+	if (pm->cmd.buttons & BUTTON_RELOAD)
+	{
+		// Don't allow reloading if weapon is firing
+		if (pm->ps->weaponstate != WEAPON_FIRING && pm->ps->weaponstate != WEAPON_RELOADING)
+		{
+			// Get the weapon data
+			int weaponNum = pm->ps->weapon;
+			int ammoIndex = weaponData[weaponNum].ammoIndex;
+			int clipSize = weaponData[weaponNum].clipSize;
+
+			// If the weapon doesn't have a clip, don't allow reloading
+			if (clipSize > 0)
+			{
+				// Get current clip ammo and total ammo
+				int currentClipAmmo = pm->ps->userInt2;
+				int totalAmmo = pm->ps->ammo[ammoIndex];
+
+				// If clip is full, don't reload
+				if (currentClipAmmo < clipSize)
+				{
+					// If no ammo left, don't reload
+					if (totalAmmo > 0)
+					{
+						// Start reloading
+						pm->ps->weaponstate = WEAPON_RELOADING;
+						pm->ps->weaponTime = weaponData[weaponNum].reloadTime;
+						pm->ps->userInt1 = pm->cmd.serverTime + weaponData[weaponNum].reloadTime; // Time when reload will complete
+
+						// Play reload sound
+						PM_AddEvent(EV_RELOAD_WEAPON);
+					}
+				}
+			}
+		}
+	}
+
 	// check for fire
 	if ( ! (pm->cmd.buttons & (BUTTON_ATTACK|BUTTON_ALT_ATTACK)))
 	{
-		pm->ps->weaponTime = 0;
-		pm->ps->weaponstate = WEAPON_READY;
+		if (pm->ps->weaponstate != WEAPON_RELOADING)
+		{
+			pm->ps->weaponTime = 0;
+			pm->ps->weaponstate = WEAPON_READY;
+		}
 		return;
 	}
 
@@ -7625,23 +7731,65 @@ static void PM_Weapon( void )
 	// take an ammo away if not infinite
 	if ( pm->ps->clientNum < MAX_CLIENTS && pm->ps->ammo[ weaponData[pm->ps->weapon].ammoIndex ] != -1 )
 	{
-		// enough energy to fire this weapon?
-		if ((pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] - amount) >= 0)
+		// Check if this weapon uses clips
+		int clipSize = weaponData[pm->ps->weapon].clipSize;
+		if (clipSize > 0)
 		{
-			pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] -= amount;
-		}
-		else	// Not enough energy
-		{
-			// Switch weapons
-			if (pm->ps->weapon != WP_DET_PACK || !pm->ps->hasDetPackPlanted)
+			// Get current clip ammo
+			int currentClipAmmo = pm->ps->userInt2;
+
+			// If clip is empty, need to reload
+			if (currentClipAmmo <= 0)
 			{
-				PM_AddEventWithParm( EV_NOAMMO, WP_NUM_WEAPONS+pm->ps->weapon );
-				if (pm->ps->weaponTime < 500)
+				// Auto-reload if we have ammo
+				if (pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] > 0)
 				{
-					pm->ps->weaponTime += 500;
+					// Start reloading
+					pm->ps->weaponstate = WEAPON_RELOADING;
+					pm->ps->weaponTime = weaponData[pm->ps->weapon].reloadTime;
+					pm->ps->userInt1 = pm->cmd.serverTime + weaponData[pm->ps->weapon].reloadTime; // Time when reload will complete
+
+					// Play reload sound
+					PM_AddEvent(EV_RELOAD_WEAPON);
 				}
+				else
+				{
+					// No ammo left
+					PM_AddEventWithParm( EV_NOAMMO, WP_NUM_WEAPONS+pm->ps->weapon );
+					if (pm->ps->weaponTime < 500)
+					{
+						pm->ps->weaponTime += 500;
+					}
+				}
+				return;
 			}
-			return;
+			else
+			{
+				// Use ammo from clip
+				pm->ps->userInt2 = currentClipAmmo - 1;
+			}
+		}
+		else
+		{
+			// Traditional ammo system for weapons without clips
+			// enough energy to fire this weapon?
+			if ((pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] - amount) >= 0)
+			{
+				pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] -= amount;
+			}
+			else	// Not enough energy
+			{
+				// Switch weapons
+				if (pm->ps->weapon != WP_DET_PACK || !pm->ps->hasDetPackPlanted)
+				{
+					PM_AddEventWithParm( EV_NOAMMO, WP_NUM_WEAPONS+pm->ps->weapon );
+					if (pm->ps->weaponTime < 500)
+					{
+						pm->ps->weaponTime += 500;
+					}
+				}
+				return;
+			}
 		}
 	}
 

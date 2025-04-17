@@ -3761,6 +3761,35 @@ void ClientSpawn(gentity_t *ent) {
 	client->inactivityTime = level.time + g_inactivity.integer * 1000;
 	client->latched_buttons = 0;
 
+	// Initialize clip ammo for weapons that use clips
+	for (i = 0; i < WP_NUM_WEAPONS; i++) {
+		if (client->ps.stats[STAT_WEAPONS] == (1 << i)) {
+			int clipSize = weaponData[i].clipSize;
+			if (clipSize > 0) {
+				// Get the ammo index for this weapon
+				int ammoIndex = weaponData[i].ammoIndex;
+
+				// Get the total ammo for this weapon
+				int totalAmmo = client->ps.ammo[ammoIndex];
+
+				// If we have ammo, fill the clip
+				if (totalAmmo > 0) {
+					// Calculate how much ammo to add to the clip
+					int ammoToAdd = clipSize;
+					if (ammoToAdd > totalAmmo) {
+						ammoToAdd = totalAmmo;
+					}
+
+					// Add ammo to clip and remove from total
+					if (i == client->ps.weapon) {
+						client->ps.userInt2 = ammoToAdd;
+						client->ps.ammo[ammoIndex] -= ammoToAdd;
+					}
+				}
+			}
+		}
+	}
+
 	if (!level.intermissiontime) {
 		if (ent->client->sess.sessionTeam != TEAM_SPECTATOR) {
 			G_KillBox(ent);

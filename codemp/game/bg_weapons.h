@@ -102,6 +102,10 @@ typedef struct weaponData_s
 
 	int		maxCharge;			// stop subtracting once charged for this many ms
 	int		altMaxCharge;		// above for secondary
+
+	// Reload system
+	int		clipSize;			// Size of the clip (0 for no reload)
+	int		reloadTime;		// Time it takes to reload the weapon
 } weaponData_t;
 
 
