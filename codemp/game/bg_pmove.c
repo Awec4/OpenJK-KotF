@@ -7739,7 +7739,7 @@ static void PM_Weapon( void )
 			int currentClipAmmo = pm->ps->userInt2;
 
 			// If clip is empty, need to reload
-			if (currentClipAmmo <= 0)
+			if (currentClipAmmo < amount)
 			{
 				// Auto-reload if we have ammo
 				if (pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] > 0)
@@ -7766,7 +7766,7 @@ static void PM_Weapon( void )
 			else
 			{
 				// Use ammo from clip
-				pm->ps->userInt2 = currentClipAmmo - 1;
+				pm->ps->userInt2 = currentClipAmmo - amount;
 			}
 		}
 		else
